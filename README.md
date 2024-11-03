@@ -8,7 +8,7 @@ Simply copy the shanten_calculator.py. No requirements or dependancies except Py
 
 
 ## Testing
-My algorithm is similar to github.com/Kraballa/ShantenCalculator, however I did discover this repository only after having had written mine. I did use their testing file though.
+My algorithm is similar to https://github.com/Kraballa/ShantenCalculator, however I did discover this repository only after having had written mine. I did use their testing file though.
 Tenhou also provides a good testing platform: https://tenhou.net/2/?q=11123345678999s1z.
 
 ## Improvements
