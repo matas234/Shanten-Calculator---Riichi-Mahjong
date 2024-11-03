@@ -1,3 +1,4 @@
+import time
 from shanten_calculator import calculateShanten
 
 def webToArray(hand_string):
@@ -19,19 +20,21 @@ def webToArray(hand_string):
     return out_arr
 
 
-
+arrays = []
 failed = 0
 passed = 0
 with open('shanten_tests.txt', 'r') as f:
     for line in f:  
         line = line.strip()
         hand_string, true_shanten = line.split(" ")
-        calculated_shanten = calculateShanten(webToArray(hand_string))
+        hand_array = webToArray(hand_string)
+        arrays.append(hand_array)
+        calculated_shanten = calculateShanten(hand_array)
 
-        print(f"hand: {hand_string}")
-        print(f"true shanten: {true_shanten}")
-        print(f"calculated shanten: {calculated_shanten}")
-        print("")
+        # print(f"hand: {hand_string}")
+        # print(f"true shanten: {true_shanten}")
+        # print(f"calculated shanten: {calculated_shanten}")
+        # print("")
 
         if calculated_shanten == int(true_shanten):
             passed += 1
@@ -40,5 +43,3 @@ with open('shanten_tests.txt', 'r') as f:
 
     print(f"passed: {passed}")
     print(f"failed: {failed}")
-
-
