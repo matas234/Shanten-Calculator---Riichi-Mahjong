@@ -1,13 +1,9 @@
-from typing import Tuple
-
-import numpy as np
-
+from typing import List, Tuple
 
 splits_groups_cache: dict[Tuple[int], Tuple[int, int, bool]] = {}
 
 
-
-def getPairs(suit_arr):
+def getPairs(suit_arr: List[int]):
     possible_pairs=[]
     for i in range(9):
         if suit_arr[i]>1:
@@ -16,7 +12,8 @@ def getPairs(suit_arr):
             possible_pairs.append(out)
     return possible_pairs
 
-def getTriplets(suit_arr):
+
+def getTriplets(suit_arr: List[int]):
     possible_triplets=[]
     for i in range(9):
         if suit_arr[i]>2:
@@ -25,7 +22,8 @@ def getTriplets(suit_arr):
             possible_triplets.append(triplet)
     return possible_triplets
 
-def completeSequences(suit_arr):
+
+def completeSequences(suit_arr: List[int]):
     possible_sequences=[]
     for i in range(2,9):
         if all(suit_arr[i-j]>0 for j in range(3)):
@@ -37,7 +35,7 @@ def completeSequences(suit_arr):
     return possible_sequences
 
 
-def incompleteSequences(suit_arr):
+def incompleteSequences(suit_arr: List[int]):
     possible_insequences=[]
     if suit_arr[0]>0 and suit_arr[1]>0:
         out = [0]*9
@@ -58,21 +56,21 @@ def incompleteSequences(suit_arr):
     return possible_insequences
 
 
-def splitsNoGroups(hand):
+def splitsNoGroups(suit_arr: List[int]):
     max_taatsu_num = 0
     max_pair_presence = False
 
-    inseqs_list = incompleteSequences(hand)
-    pairs_list = getPairs(hand)
+    inseqs_list = incompleteSequences(suit_arr)
+    pairs_list = getPairs(suit_arr)
 
     for pair in pairs_list:
-        cur_taatsu_num = splitsNoGroups([h - p for h, p in zip(hand, pair)])[0] + 1
+        cur_taatsu_num = splitsNoGroups([h - p for h, p in zip(suit_arr, pair)])[0] + 1
         if cur_taatsu_num > max_taatsu_num:
             max_taatsu_num = cur_taatsu_num
             max_pair_presence = True
 
     for inseq in inseqs_list:
-        cur_taatsu_num, cur_pair_presence = splitsNoGroups([h - i for h, i in zip(hand, inseq)])
+        cur_taatsu_num, cur_pair_presence = splitsNoGroups([h - i for h, i in zip(suit_arr, inseq)])
         cur_taatsu_num += 1
         if cur_taatsu_num > max_taatsu_num:
             max_taatsu_num = cur_taatsu_num
@@ -81,25 +79,25 @@ def splitsNoGroups(hand):
     return max_taatsu_num, max_pair_presence
 
 
-def splits(hand, groupNum=0, pair_presence=False):  
-    ## checks if hand is cached
-    if tuple(hand) in splits_groups_cache:
-        (cached_group_num, cached_tatsu_num, cached_pair_presence) = splits_groups_cache[tuple(hand)]
+def splits(suit_arr: List[int], groupNum: int = 0, pair_presence: bool = False):  
+    ## checks if suit_arr is cached
+    if tuple(suit_arr) in splits_groups_cache:
+        (cached_group_num, cached_tatsu_num, cached_pair_presence) = splits_groups_cache[tuple(suit_arr)]
         return (cached_group_num + groupNum, cached_tatsu_num, cached_pair_presence or pair_presence)
         
     max_grp_num = groupNum
     max_tatsu_num = 0
     max_pair_presence = pair_presence
     
-    seqs = completeSequences(hand)
-    triplets = getTriplets(hand)
+    seqs = completeSequences(suit_arr)
+    triplets = getTriplets(suit_arr)
 
     cur_grp_num = 0
     cur_taatsu_num = 0
     cur_pair_presence = False
 
     for meld in seqs + triplets:
-        cur_grp_num, cur_taatsu_num, cur_pair_presence = splits([h - m for h, m in zip(hand, meld)], groupNum+1, pair_presence)
+        cur_grp_num, cur_taatsu_num, cur_pair_presence = splits([h - m for h, m in zip(suit_arr, meld)], groupNum+1, pair_presence)
         
         if cur_grp_num > max_grp_num:
             max_grp_num = cur_grp_num
@@ -112,21 +110,21 @@ def splits(hand, groupNum=0, pair_presence=False):
                 max_pair_presence = cur_pair_presence
 
     if (not seqs) and (not triplets):     #if no more groups then counts maximum of taatsu    
-        max_tatsu_num, max_pair_presence = splitsNoGroups(hand)
+        max_tatsu_num, max_pair_presence = splitsNoGroups(suit_arr)
 
 
-    splits_groups_cache[tuple(hand)] = (max_grp_num - groupNum, max_tatsu_num, max_pair_presence)
+    splits_groups_cache[tuple(suit_arr)] = (max_grp_num - groupNum, max_tatsu_num, max_pair_presence)
 
     return max_grp_num, max_tatsu_num, max_pair_presence
 
 
-def splitsTotal(hand):
+def splitsTotal(hand: List[List[int]]):
     ## num of groups, num of taatsu, has pair
     total_split = [0,0,False]
     # print(type(hand), hand)
 
     for suit_tiles in hand[:3]:
-        suit_split = splits(hand=suit_tiles)
+        suit_split = splits(suit_arr = suit_tiles)
         total_split[0] += suit_split[0]
         total_split[1] += suit_split[1]
         total_split[2] |= suit_split[2]
@@ -141,7 +139,7 @@ def splitsTotal(hand):
     return total_split
 
 
-def generalShanten(hand_array, numCalledMelds=0):
+def generalShanten(hand_array: List[List[int]], numCalledMelds: int = 0):
     total_split = splitsTotal(hand_array)
     taatsu_num = total_split[1]
     group_num = total_split[0] + numCalledMelds
@@ -156,7 +154,7 @@ def generalShanten(hand_array, numCalledMelds=0):
     return 8 - 2*group_num - min(taatsu_num, 4 - group_num) - min(1, max(0, taatsu_num + group_num - 4) ) + p
 
 
-def chiitoitsuShanten(hand_array):
+def chiitoitsuShanten(hand_array: List[List[int]]):
     num_pairs = 0
     for suit in hand_array:
         for tile in suit:
@@ -165,7 +163,7 @@ def chiitoitsuShanten(hand_array):
     return 6 - num_pairs
 
 
-def orphanSourceShanten(hand_array):
+def orphanSourceShanten(hand_array: List[List[int]]):
     diff_terminals = 0
     pairs_terminals = 0
     pair_const = 0
@@ -187,7 +185,7 @@ def orphanSourceShanten(hand_array):
 
 SPLIT_INDICES = [9,18,27,34]
 
-def calculateShanten(hand, called_melds_num=0):
+def calculateShanten(hand: List[int], called_melds_num: int = 0):
     hand_array = [hand[i:j] for i, j in zip([0] + SPLIT_INDICES[:-1], SPLIT_INDICES)]
 
     return min(generalShanten(hand_array, called_melds_num), 
