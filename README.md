@@ -11,5 +11,6 @@ Simply copy the shanten_calculator.py. No requirements or dependancies except Py
 My algorithm is similar to https://github.com/Kraballa/ShantenCalculator, however I did discover this repository only after having had written mine. I did use their testing file though.
 Tenhou also provides a good testing platform: https://tenhou.net/2/?q=11123345678999s1z.
 
-## Improvements
-Caching could be used to greatly improve the overall speed if the function is to be called a lot. However, the overhead is not worth it if only called a few times.
+## Usage
+Shanten_calculator.py contains the calculateShanten functions. The input is the hand represented as a 2d list of each suit, each index in the subarrays being the number of tiles of that number.
+Currently the file performs caching, which is signifantly faster if you're doing a lot of shanten calculations. However the overhead is not worth it for a few calls, so you can disable it inside the splits() function.
