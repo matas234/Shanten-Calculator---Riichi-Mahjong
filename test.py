@@ -21,21 +21,30 @@ def webToArray(hand_string):
     return out_arr
 
 
-arrays = []
+
 failed = 0
 passed = 0
 with open('shanten_tests.txt', 'r') as f:
-    for line in f:  
-        line = line.strip()
-        hand_string, true_shanten = line.split(" ")
-        hand_array = webToArray(hand_string)
-        arrays.append(hand_array)
-        calculated_shanten = calculateShanten(hand_array)
+    start = time.perf_counter()
 
-        if calculated_shanten == int(true_shanten):
-            passed += 1
-        else:
-            failed += 1
+    f.seek(0)
+    for i in range(10000):
+        for line in f:
+            line = line.strip()
+            hand_string, true_shanten = line.split(" ")
+            hand_array = webToArray(hand_string)
+            calculated_shanten = calculateShanten(hand_array)
 
+            if calculated_shanten == int(true_shanten):
+                passed += 1
+            else:
+                failed += 1
+
+        f.seek(0)
+
+
+        end = time.perf_counter()
+
+    print(f"Time: {(end - start) * 1_000:.3f}ms, Average: {(end - start) * 1_000_000 / (passed + failed):.3f}ms per hand")
     print(f"passed: {passed}")
     print(f"failed: {failed}")

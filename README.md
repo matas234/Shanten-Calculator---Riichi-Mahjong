@@ -1,5 +1,5 @@
 ## Shanten calculor
-This is my implementation of a riichi mahjong shanten calculator in Python. The algorithm employs a recursive depth-first search on the different suits of the hand to find the optimal "split". Note, the honours are trivial as they can only form pairs and triplets.
+This is my implementation of a riichi mahjong shanten calculator in Python. The algorithm employs a recursive depth-first search with memoization on the different suits of the hand to find the optimal "split". Note, the honours are trivial as they can only form pairs and triplets.
 Once the "split" has been found, the problem is trivial as there is a "simple" formula for the shanten (see: https://riichi.wiki/Shanten).
 The formula doesnt account for pair presence though so there is a +1 when (taatsus + pairs >= 5 - groups) and (no pair).
 
@@ -13,4 +13,4 @@ Tenhou also provides a good testing platform: https://tenhou.net/2/?q=1112334567
 
 ## Usage
 Shanten_calculator.py contains the calculateShanten functions. The input is the hand represented as a 2d list of each suit, each index in the subarrays being the number of tiles of that number.
-Currently the file performs caching, which is signifantly faster if you're doing a lot of shanten calculations. However the overhead is not worth it for a few calls, so you can disable it inside the splits() function.
+Currently the file performs caching, which is signifantly faster if you're doing a lot of shanten calculations. However, the speed is roughly the same for a single call.
